@@ -35,7 +35,7 @@
             repo: '',
             search: 'auto', // 默认值
             loadSidebar: true,
-            subMaxLevel: 2,
+            subMaxLevel: 3,
             coverpage: false,
             onlyCover: true,
             loadNavbar: false,
@@ -48,7 +48,12 @@
             themeable: {
                 readyTransition: true, // default
                 responsiveTables: true  // default
-            }
+            },
+            footer: {
+                copy: '<span>&copy; 2020</span>',
+                auth: '<a href="https://www.github.com/object-kaz" target="_blank_">ObjectKaz</a>',
+                pre: '<hr/>',
+            },
         }
     </script>
     <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
@@ -76,6 +81,8 @@
     <script src="https://cdn.jsdelivr.net/npm/docsify-mermaid@1.0.0/dist/docsify-mermaid.js"></script>
     <!-- 主题 -->
     <script src="https://cdn.jsdelivr.net/npm/docsify-themeable@0"></script>
+    <!--自定义结尾-->
+    <script src="https://cdn.jsdelivr.net/npm/docsify-footer-enh@0.0.5/dist/docsify-footer-enh.min.js"></script>
 </body>
 
 </html>
