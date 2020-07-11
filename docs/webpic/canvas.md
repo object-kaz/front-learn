@@ -1,5 +1,12 @@
-## 一.Canvas栅格
+## 一.获取画布上下文
+使用 `getContext`函数。
+```js
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext('2d');
+```
 
+## 二.Canvas坐标系
+### 1.概述
 1.	大小：画布的总宽度为画布的 `width` 属性，总高度为画布的 `height` 属性。
 2.	背景：画布是透明的。
 3.	原点：位于画布的左上角，所有的位置均相当于原点定位。
@@ -9,12 +16,76 @@
 ![](https://mdn.mozillademos.org/files/224/Canvas_default_grid.png)
 (图片引用自MDN)
 
-## 二.获取画布上下文
-使用 `getContext`函数。
-```js
-var canvas = document.getElementById('canvas');
-var ctx = canvas.getContext('2d');
-```
+### 2.坐标系的变换
+
+> 此处 `ctx` 指 `context` 对象
+
+|名称|原点变换|旋转变换|缩放变换|
+|----|----|----|----|
+|函数|`void ctx.translate(x, y)`|`void ctx.rotate(angle)`|`void ctx.scale(x, y)`|
+|函数说明|移动原点到$(x,y)$|将x轴顺时针旋转一定弧度(angle)|将坐标轴按比例缩放。|
+|图例|![](https://developer.mozilla.org/@api/deki/files/85/=Canvas_grid_translate.png)|![](https://developer.mozilla.org/@api/deki/files/84/=Canvas_grid_rotate.png)|空|
+|坐标变换|$\pmb{v'}=\pmb{v} + \begin{pmatrix}   x\\ y\end{pmatrix}$|$\pmb{v'}=\begin{pmatrix}   \cos{a} & -\sin{a}\\ \sin{a} &\cos{a}\end{pmatrix}\pmb{v}$|$\pmb{v'}=\begin{pmatrix}   x & 0\\ 0 &y\end{pmatrix}\pmb{v}$|
+|变形矩阵|$\begin{pmatrix}   1& 0 & x \\ 0 & 1 & y \\0 & 0 & 1 \end{pmatrix}$|$\begin{pmatrix}   \cos{a}& -\sin{a} & 0 \\ \sin{a} & \cos{a} & 0 \\0 & 0 & 1 \end{pmatrix}$|$\begin{pmatrix}   x& 0 & 0 \\ 0 & y & 0 \\0 & 0 & 1 \end{pmatrix}$|
+
+### 3.变形矩阵
+1.	操作变形矩阵的函数
+
+|函数|说明|
+|----|----|
+|`void context.transform(a, b, c, d, e, f)`|将当前的变形矩阵乘上一个基于自身参数的矩阵|
+|`void context.setTransform(a, b, c, d, e, f)`|将当前的变形矩阵重置为单位矩阵，然后用相同的参数调用 `transform` 方法。|
+|`void context.resetTransform()`|重置当前变形为单位矩阵。|
+
+其中，基于自身参数的矩阵：
+$$
+\begin{pmatrix}   
+a & c & e \\ 
+b & d & f \\
+0 & 0 & 1 
+\end{pmatrix}
+$$
+其中：
+
+|名称|a|b|c|d|e|f|
+|----|----|----|----|----|----|----|
+|含义|水平方向的缩放|水平方向的倾斜偏移|竖直方向的倾斜偏移|竖直方向的缩放|水平方向的移动|竖直方向的移动|
+|初始值|1|0|0|1|0|0|
+
+2.	变形矩阵的含义：建立两个坐标之间的映射
+
+$$
+\begin{pmatrix}   
+x' \\ 
+y' \\
+1
+\end{pmatrix}
+=
+\begin{pmatrix}   
+a & c & e \\ 
+b & d & f \\
+0 & 0 & 1 
+\end{pmatrix}
+\begin{pmatrix}   
+x \\ 
+y \\
+1
+\end{pmatrix}
+$$
+
+变换后，原点为 $\begin{pmatrix} e \\ f\end{pmatrix}$，基为 $\begin{pmatrix} a \\b\end{pmatrix}$ 和 $\begin{pmatrix} c \\d\end{pmatrix}$.
+
+### 4.保存状态
+
+|函数|说明|
+|----|----|
+|`void context.save()`|保存当前画布的状态，包括变换矩阵和自定义的样式|
+|`void context.restore()`|恢复画布的状态，包括变换矩阵和自定义的样式。|
+
+<!-- tabs:start -->
+#### **例：利用变形矩阵绘制加载进度条**
+<iframe width="100%" height="300" src="//jsrun.net/hGvKp/embedded/all/light" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+<!-- tabs:end -->
 
 ## 三.图形绘制
 ### 1. 绘制矩形
@@ -24,7 +95,7 @@ var ctx = canvas.getContext('2d');
 |----|----|
 |`void context.fillRect(x, y, width, height)`|绘制一个填充的矩形|
 |`void context.strokeRect(x, y, width, height)`|绘制一个矩形边界|
-|`void context.clearRect(x, y, width, height)`|清楚指定矩形区域，使其完全透明|
+|`void context.clearRect(x, y, width, height)`|清除指定矩形区域，使其完全透明|
 
 ### 2. 绘制路径
 1.	绘制路径的步骤：
@@ -40,6 +111,7 @@ var ctx = canvas.getContext('2d');
 |`void context.closePath()`|闭合路径之后图形绘制命令又重新指向到上下文中。|
 |`void context.stroke([Path2DObj])`|通过线条来绘制图形轮廓，可以添加一个`Path2D`对象作为参数。|
 |`void context.fill([Path2DObj])`|通过填充路径的内容区域生成实心的图形，可以添加一个`Path2D`对象作为参数。|
+|`void context.clip()`|将当前路径设置为裁切路径。后面的图形只会绘制在该路径内。|
 
 3.	操作画笔的函数
 
@@ -83,7 +155,57 @@ void Path2DObj.addPath(path [, transform]);
 ```
 4.	使用`context.stroke` 和 `context.fill` 函数将路径添加到画布上。
 
-## 四.图形样式
+## 四.文本绘制
+### 1.绘制文本
+|语法|说明|
+|----|----|
+|`void context.fillText(text, x, y [, maxWidth])`|在指定的$(x,y)$位置填充指定的文本，绘制的最大宽度是可选的。|
+|`void context.strokeText(text, x, y [, maxWidth])`|在指定的$(x,y)$位置绘制文本边框，绘制的最大宽度是可选的.|
+
+### 2.设置文本样式
+
+|语法|可选值|默认值|说明|
+|----|----|----|----|
+|`context.font = value`|无|"10px sans-serif"|设置字体。|
+|`context.textAlign = value`|`start`, `end`, `left`, `right`,`center`|`start`|设置对齐。|
+|`context.textBaseline = value`|`top`, `hanging`, `middle`, `alphabetic`, `ideographic`, `bottom`|`alphabetic`|设置文字基线对齐。|
+|`context.direction = value`|`ltr`, `rtl`, `inherit`|`inherit`|设置文字方向。|
+
+文字基线对齐参考：
+![](http://www.whatwg.org/specs/web-apps/current-work/images/baselines.png)
+
+### 3.获取文字细节
+|语法|说明|
+|----|----|
+|`TextMetrics context.measureText(text)`|衡量文本信息。|
+|`TextMetricsObj.width`|（只读）文本宽度。|
+
+## 五.插入图片
+### 1.可用的图片源
+|源|说明|
+|----|----|
+|`HTMLImageElement`|HTML `img` 元素，或创建的 `Image`对象。|
+|`HTMLVideoElement`|HTML `video` 元素，可抓取帧作为图片。|
+|`HTMLCanvasElement`|HTML `canvas`元素。|
+|`ImageBitmap`|高性能的位图对象。|
+
+### 2.获取页面内的图片
+|方法|说明|
+|----|----|
+|`document.images`|（只读）所有`img` 元素。|
+|`document.getElementsByTagName()`等|获取指定元素。|
+|`var img = new Image();img.src="somepic.png"`|手动加载图片。图片加载完之前不能绘制。（在 `onload`事件里加载）|
+
+### 3.绘制图片
+
+|方法|说明|
+|----|----|
+|`void context.drawImage(image, x, y)`|绘制图片，其中 image 是 image 或者 canvas 对象，x 和 y 是其在目标 canvas 里的起始坐标。|
+|`void context.drawImage(image, x, y, width, height)`|绘制图片，其中$(width, height)$定义了图片的大小。|
+|`void context.drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh)`|绘制图片，其中$(sx, sy)$定义了图片切割起点位置，$(sw, sh)$定义了图片切割的大小；$(dx, dy)$定义了画布内图片的起始位置，$(dw, dh)$定义了目标图片的大小。|
+![](https://mdn.mozillademos.org/files/225/Canvas_drawimage.jpg)
+
+## 六.设置样式
 ### 1.调整颜色
 
 |语法|说明|
@@ -140,7 +262,7 @@ void Path2DObj.addPath(path [, transform]);
 |函数|说明|
 |----|----|
 |`Array context.getLineDash()`|返回一个包含当前虚线样式，长度为非负偶数的数组。|
-|`void context.setLineDash(segments)`|设置当前虚线样式。参数是一个二维数组，指定线段和间隙的长度。|
+|`void context.setLineDash(segments)`|设置当前虚线样式。参数是一个长度为2的数组，指定线段和间隙的长度。|
 |`context.lineDashOffset = value`|设置虚线样式的起始偏移量。|
 
 ### 5.添加渐变
@@ -163,3 +285,63 @@ void Path2DObj.addPath(path [, transform]);
 <iframe width="100%" height="300" src="//jsrun.net/mdvKp/embedded/all/light" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 <!-- tabs:end -->
+
+### 6.添加图案
+1.	创建图案的函数
+
+|函数|说明|
+|----|----|
+|`CanvasPattern context.createPattern(image, repetition)`|创建一个图案对象，`image`是可用的图片对象;`repetition`为重复方式，有`repeat`，`repeat-x`，`repeat-y` 和 `no-repeat`四个值。图片加载完后才能调用此函数。|
+
+2.	步骤：
+	1.	创建图案
+	2.	将图案对象用于 `context.fillStyle`或`context.strokeStyle`
+
+
+### 7.添加阴影
+1.	创建阴影的语法（影响后面创建的任何对象，包括文字和图片）
+
+|语法|默认|说明|
+|----|----|----|
+|`context.shadowOffsetX = float`|0|阴影在X轴的偏移。|
+|`context.shadowOffsetY = float`|0|阴影在Y轴的偏移。|
+|`context.shadowBlur = float`|0|阴影模糊程度。|
+|`context.shadowColor = color`|`"black"`|阴影颜色。|
+
+## 七.图形组合（只作了解）
+|语法|默认|说明|
+|----|----|----|
+|`context.globalCompositeOperation = val`|`source-over`|设置遮盖策略。|
+
+遮盖策略一共有26种：
+
+|策略|说明|
+|----|----|
+|`source-over`|（默认）在原画布上绘制图形。原图形在下面。|
+|`source-in`|在两个画布重叠的地方绘制。不绘制原图形。|
+|`source-out`|在两个画布不重叠的地方绘制。不绘制原图形。|
+|`source-atop`|在两个画布重叠的地方绘制。绘制原图形，但原图形在下面。|
+|`destination-over`|在原画布上绘制图形。原图形在上面。|
+|`destination-in`|在两个画布重叠的地方绘制。不绘制新图形。|
+|`destination-out`|在两个画布不重叠的地方绘制。不绘制新图形。|
+|`destination-atop`|在两个画布重叠的地方绘制。绘制新图形，但原图形在上面。|
+|`lighter`|直接颜色值相加。|
+|`copy`|只显示新图形。|
+|`xor`|重叠部分透明。|
+|`multiply`|将顶层像素与底层相应像素相乘，结果是一幅更黑暗的图片。|
+|`screen`|像素被倒转，相乘，再倒转，结果是一幅更明亮的图片。|
+|`overlay`|multiply和screen的结合，原本暗的地方更暗，原本亮的地方更亮。|
+|`darken`|保留两个图层中最暗的像素。|
+|`lighten`|保留两个图层中最亮的像素。|
+|`color-dodge`|将底层除以顶层的反置。|
+|`color-burn`|将底层除以顶层的反置，然后将结果反过来。|
+|`hard-light`|类似于叠加，但上下图层互换了。|
+|`soft-light`|用顶层减去底层或者相反来得到一个正值。|
+|`difference`|一个柔和版本的强光（hard-light）。纯黑或纯白不会导致纯黑或纯白。|
+|`exclusion`|和difference相似，但对比度较低。|
+|`hue`|保留了底层的亮度（luma）和色度（chroma），同时采用了顶层的色调（hue）。|
+|`saturation`|保留底层的亮度（luma）和色调（hue），同时采用顶层的色度（chroma）。|
+|`color`|保留了底层的亮度（luma），同时采用了顶层的色调(hue)和色度(chroma)。|
+|`luminosity`|保持底层的色调（hue）和色度（chroma），同时采用顶层的亮度（luma）。|
+
+
