@@ -25,24 +25,106 @@
 ## 四.flex布局
 ![](http://www.ruanyifeng.com/blogimg/asset/2015/bg2015071004.png)
 （图片引用自阮一峰博客）
-### 1.容器属性
 
-| 属性            | 可选值                                                       | 默认值     | 说明                                 |
-| --------------- | ------------------------------------------------------------ | ---------- | ------------------------------------ |
-| flex-direction  | row , row-reverse , column , column-reverse                  | row        | 主轴的方向                           |
-| flex-wrap       | nowrap , wrap , wrap-reverse                                 | nowrap     | 是否允许换行                         |
-| flex-flow       |                                                              | row wrap   | 前两个属性的缩写                     |
-| justify-content | flex-start , flex-end , center , space-between(两端对齐) , space-around(项目两侧间隔相等) | flex-start | 项目在主轴的对齐方式                 |
-| align-items     | flex-start , flex-end , center , baseline(项目的第一行文字的基线对齐) , stretch | stretch    | 项目在交叉轴的对齐方式(一条主轴线)   |
-| align-content   | flex-start , flex-end , center , baseline(项目的第一行文字的基线对齐) , stretch | stretch    | 项目在交叉轴的对齐方式（多条主轴线） |
+### 容器属性--方向
 
-### 2.内容属性
+#### flex-direction
 
-| 属性        | 可选值 | 默认值   | 说明                                                         |
-| ----------- | ------ | -------- | ------------------------------------------------------------ |
-| order       | 无     | 0        | 显示顺序（大的在后面）                                       |
-| flex-grow   | 无     | 0        | 项目放大的比例，0表示有剩余空间时不放大。                    |
-| flex-shrink | 无     | 1        | 项目放大的比例，1表示空间不足时会缩小。                      |
-| flex-basis  | 无     | auto     | 分配多余空间之前，它需要占用的空间。                         |
-| flex        | 无     | 0 1 auto | flex-grow,flex-shrink,flex-basis的合写。(auto=1 1 auto,none= 0 0 auto) |
-| align-self  | 无     | auto     | 用于覆盖align-items属性。                                    |
+决定主轴的方向
+
+| 值               | 方向 | 起点   |
+| ---------------- | ---- | ------ |
+| `row`(默认)      | 水平 | 左上角 |
+| `row-reverse`    | 水平 | 右上角 |
+| `column`         | 竖直 | 左上角 |
+| `column-reverse` | 竖直 | 左下角 |
+
+#### flex-wrap 
+
+是否换行
+
+| 值             | 说明       | 第一行位置（交叉轴方向 ↓） |
+| -------------- | ---------- | -------------------------- |
+| `nowrap`(默认) | 不允许换行 | 上方                       |
+| `wrap`         | 换行       | 上方                       |
+| `wrap-reverse` | 换行       | 下方                       |
+
+#### flex-flow
+
+上面两个属性的合写
+
+### 容器属性--对齐
+
+#### justify-content
+
+决定了 容器元素 在主轴上的对齐方式。
+
+（不考虑 `margin`属性）
+
+| 值                   | 对齐方式（→为主轴正方向） | 容器元素之间的距离 | 容器元素与边界的距离         |
+| -------------------- | ------------------------- | ------------------ | ---------------------------- |
+| `flex-start`（默认） | 左对齐                    | 0                  | 任意值                       |
+| `flex-end`           | 右对齐                    | 0                  | 任意值                       |
+| `center`（常用）     | 居中对齐                  | 0                  | 任意值                       |
+| `space-between`      | 两端对齐                  | 相等               | 0                            |
+| `space-around`       | 两端对齐                  | 相等               | 等于容器元素之间的距离的一半 |
+| `space-evenly`       | 两端对齐                  | 相等               | 等于容器元素之间的距离       |
+
+#### align-items和align-content
+
+这两个属性决定了 容器元素在交叉轴上的对齐方式。
+
+其中 `align-items` 针对单行元素，`align-content` 针对多行元素。
+
+（不考虑 `margin`属性）
+
+| 值                   | 对齐方式（↓为交叉轴正方向） |
+| -------------------- | --------------------------- |
+| `flex-start`（默认） | 顶部对齐                    |
+| `flex-end`           | 底部对齐                    |
+| `center`（常用）     | 居中对齐                    |
+| `stretch`            | 拉伸                        |
+
+### 元素属性
+
+#### order
+
+用于指定元素的显示顺序。数字越大，顺序越靠后。
+
+**默认值** 0
+
+#### flex-grow
+
+元素放大的比例，0表示有剩余空间时不放大。
+
+如果两个元素的增长比例为 2:1，那么这两个元素占用空间之比为 2:1。
+
+**默认值** 0
+
+#### flex-shrink
+
+定义项目缩小的比例，0表示有没有剩余空间时不缩小。
+
+如果所有项目的`flex-shrink`属性都为1，当空间不足时，都将等比例缩小。
+
+**默认值** 1
+
+#### flex-basis
+
+定义了在分配多余空间之前，项目占据的主轴空间。
+
+**默认值** auto（项目本来的大小）
+
+#### flex
+
+是 `flex-grow`、`flex-shrink`、`flex-basis`的缩写（按顺序）。
+
+```css
+flex:0 1 auto;
+```
+
+#### align-self
+
+允许单个项目有与其他项目不一样的对齐方式，可覆盖`align-items`属性。其取值等同于`align-items`。
+
+**默认值** auto(继承容器属性)
