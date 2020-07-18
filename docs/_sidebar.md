@@ -8,7 +8,6 @@
 		* [选择器](css/selector.md)
 		* [文本属性](css/text.md)
 		* [盒模型](css/box.md)
-		* [定位](css/position.md)
 		* [布局](css/layout.md)
 		* [渐变](css/gradient.md)
 		* [过渡和动画](css/animation.md)
