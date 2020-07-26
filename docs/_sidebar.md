@@ -13,8 +13,13 @@
 		* [过渡和动画](css/animation.md)
 
 	* JavaScript
+		* [基础](js/base.md)
+		* [原始数据类型](js/data.md)
+		* [Array、Object、Map和Set](js/ds.md)
+		* 函数
+		* 面向对象
+		* 异步
 		* [杂记](js/misc.md)
-		* [canvas绘图](webpic/canvas.md)
 * 框架篇
 	* Vue
 		* [介绍](vue/introduction.md)
@@ -29,6 +34,12 @@
 		* [服务端渲染](vue/ssr.md)
 
 * 环境篇
+	* 浏览器环境
+		* DOM
+		* BOM
+		* 事件
+		* AJAX
+		* [canvas绘图](webpic/canvas.md)
 	* Node环境
 	* 微信小程序环境
 
