@@ -1,0 +1,29 @@
+{
+  "name": "front-learn",
+  "version": "1.0.0",
+  "description": "notes about front-end",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "server": "docsify serve ./docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/object-kaz/front-learn.git"
+  },
+  "keywords": [
+    "learn",
+    "note"
+  ],
+  "author": "ObjectKaz",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/object-kaz/front-learn/issues"
+  },
+  "homepage": "https://github.com/object-kaz/front-learn#readme",
+  "devDependencies": {
+    "docsify-cli": "^4.4.1"
+  }
+}
