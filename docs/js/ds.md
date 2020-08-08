@@ -1,14 +1,4 @@
-
-
-## [ES6]一.可迭代对象
-
-`Array`、`Map`和`Set`属于`iterable`（可迭代对象）类型。
-
-可迭代对象可以使用 `for-of` 循环进行遍历。
-
-!> `Object` 不是可迭代对象，不能使用 `for-of` 循环。
-
-## 二.Array
+## 一.Array
 
 `Array`可以包含任意数据类型，并通过索引来访问每个元素。
 
@@ -286,18 +276,34 @@ iterator.next(); /*{ value: undefined, done: true }*/
 ```
 `iterator` 可以使用 `for-of` 循环，也可以使用 `iterator.next()`方法进行迭代。
 
-## 三.Object
-JavaScript的对象是一种 **无序的集合数据类型**，它由若干 **键值对** 组成。其中，值可以是任意类型，但键只能是**字符串**。
+## 二.Object
+JavaScript的对象是一种 **无序的集合数据类型**，它由若干 **键值对** 组成。其中，值可以是任意类型，但键只能是**字符串**和 **Symbol**。
 
 ### 定义一个对象
 1.	使用`{}`语法：`var obj = {a:1,b:2}`
 2.	使用 `new`语法： `var obj = new Object({a:1,b:2})`
 
 注意事项：
-定义对象时，若键 *key* 有特殊字符，则需要用 `''` 括起来：
+1.	定义对象时，若键 *key* 有特殊字符，则需要用 `''` 括起来：
 
 ```js
 var obj = {'a-b':1}
+```
+
+2.	当定义对象时，后面有重复的属性，则会覆盖前面的属性。
+
+3.	[ES6] 属性的简洁表示法：可以在大括号里面，直接写入变量和函数，作为对象的属性和方法。这样的书写更加简洁。
+	!> 简写的对象方法，不能当作构造函数使用。
+
+```js
+let a = 1
+let b = {a} // 相当于 let b = {a:a}
+let c = {
+	f() //直接定义函数
+	{
+		return 2233;
+	}
+}
 ```
 
 ### 常用对象操作
@@ -335,13 +341,13 @@ Object.values([1,2,3,4,5]) //[1,2,3,4,5]
 Object.values({a:1,b:2}) //[1, 2]
 ```
 
-## [ES6]四.Map
+## [ES6]三.Map
 `Map`是一组键值对的结构，具有极快的查找速度。
 
 ### `Map`和 `Object` 的主要区别
 |比较|`Map`|`Object`|
 |----|----|----|
-|键的类型|任意值|字符串|
+|键的类型|任意值|字符串或**Symbol**|
 |顺序|有序|无序|
 |大小|可直接获取|手动计算|
 
@@ -426,7 +432,7 @@ for(let val of map.values()) console.log(val)
 <!-- tabs:end -->
 
 
-## [ES6]五.Set
+## [ES6]四.Set
 `Set`是一组键的集合，但相邻两个键不能重复。
 
 > Set 通常用于过滤重复元素
@@ -495,3 +501,318 @@ for(let val of set.values()) console.log(val)
 ```
 <!-- tabs:end -->
 
+## [ES6]五.数组和对象的高级操作
+### 拓展运算符
+#### 字符串和数组的的拓展运算符
+字符串和数组的的拓展运算符 `...` 用于取出数组的所有值，拷贝到另一个数组或函数参数列表中。
+
+1.	运用：
+	+	数组复制、合并、追加元素
+	+	函数调用
+	+	字符串转数组
+	+	可迭代对象和迭代器转数组
+
+<!-- tabs:start -->
+
+#### **函数调用**
+
+```js
+console.log(...[1, 2, 3])
+console.log(1, ...[2, 3, 4], 5)
+f(1,2,3,...[1,2,3,4,5,6])
+```
+
+#### **数组复制**
+
+```js
+var a = [1,2,3,4,5]
+var b = [...a]
+a === b //false
+```
+
+#### **字符串转数组**
+
+```js
+[...'hello'] // [ "h", "e", "l", "l", "o" ]
+```
+
+#### **可迭代对象转数组**
+
+```js
+let map = new Map([
+  [1, 'one'],
+  [2, 'two'],
+  [3, 'three'],
+]);
+let arr = [...map] // (3) [Array(2), Array(2), Array(2)]
+arr = [...map.keys()] //(3) [1, 2, 3]
+```
+
+<!-- tabs:end -->
+
+2.	数组的拓展运算符只会将元素进行浅拷贝。
+
+```js
+var a = [{a:1},{a:2}]
+var b = [...a]
+b[0] === a[0] //true
+```
+
+#### 对象的拓展运算符
+
+对象的扩展运算符`...`用于取出参数对象中的所有可遍历属性，拷贝到当前对象之中。
+
+1.	运用：
+	+	对象复制、合并、追加属性
+
+```js
+var o1 = {a:1,b:2}
+var o2 = {...o1}
+```
+
+### 解构赋值
+解构赋值可以对同一组变量进行赋值，简化语法。
+
+1.	解构赋值比传统赋值的语法更简洁
+	
+	!> 解构数组时，变量名的顺序决定了对应下标
+
+<!-- tabs:start -->
+#### **传统赋值**
+```js
+var arr = [1,2,3]
+var a = arr[0]
+var b = arr[1]
+var c = arr[2]
+```
+#### **解构赋值**
+```js
+var arr = [1,2,3]
+var [a,b,c] = arr
+```
+<!-- tabs:end -->
+
+2.	解构赋值支持嵌套
+
+<!-- tabs:start -->
+#### **含嵌套的解构赋值**
+```js
+var arr = [1,[2,3]]
+var [a,[b,c]] = arr
+```
+<!-- tabs:end -->
+
+3.	解构赋值可以忽略某些元素
+
+<!-- tabs:start -->
+#### **忽略前面的元素**
+```js
+var arr = [1,2,3,4]
+var [,,a,b] = arr
+console.log(a)
+console.log(b)
+```
+#### **忽略后面的元素**
+```js
+var arr = [1,2,3,4]
+var [a,b] = arr
+console.log(a)
+console.log(b)
+```
+<!-- tabs:end -->
+
+4.	解构赋值可以从对象取出属性，同样支持嵌套。
+	
+	!> 解构对象时，变量名必须和相应的属性名一致
+
+<!-- tabs:start -->
+#### **解构对象的属性**
+```js
+var {name,value} = {name:'hi',value:20,id:3}
+console.log(name)
+console.log(value)
+```
+<!-- tabs:end -->
+
+5.	解构赋值可以为对象的属性定义别名
+
+<!-- tabs:start -->
+#### **定义别名**
+```js
+var {name,value:val} = {name:'hi',value:20,id:3}
+console.log(name)
+console.log(val)
+```
+<!-- tabs:end -->
+
+6.	解构赋值可以定义默认值。当传入的属性不存在时，便会使用默认值。
+
+<!-- tabs:start -->
+#### **默认值**
+```js
+var {name,single:true} = {name:'hi',value:20,id:3}
+console.log(name)
+console.log(single)
+```
+<!-- tabs:end -->
+
+7.	字符串的解构赋值：会被转换换成类似数组的对象
+
+```js
+var [a,b] = "hello"
+a //h
+b //e
+```
+
+8.	`number` 和 `boolean`的解构赋值：先转换成对象，再进行解构赋值
+
+```js
+var {toString} = 123;
+toString == Number.prototype.toString //true
+```
+
+9.	函数参数的解构赋值：将参数分解为变量
+
+<!-- tabs:start -->
+#### **默认值在解构内**
+如果解构失败，`x`和`y`等于默认值。
+```js
+function f({x = 0, y = 0} = {}) {
+  return [x, y];
+}
+
+f({x: 2, y: 3}); // [2, 3]
+f({x: 2}); // [2, 0]
+f({}); // [0, 0]
+f(); // [0, 0]
+```
+#### **默认值在解构外**
+下面代码是为函数 `move` 的参数指定默认值，而不是为变量 `x` 和 `y` 指定默认值。当参数为 `{}` 时，默认值不生效，相应值为 `undefined`。
+```js
+function f({x, y} = { x: 0, y: 0 }) {
+  return [x, y];
+}
+
+f({x: 2, y: 3}); // [2, 3]
+f({x: 2}); // [2, undefined]
+f({}); // [undefined, undefined]
+f(); // [0, 0]
+```
+<!-- tabs:end -->
+
+10.	使用已声明的变量进行解构赋值时，需要将整条语句用 `()` 括起来，否则`JavaScript`引擎会将解构赋值当做块作用域的开头处理。
+
+<!-- tabs:start -->
+
+#### **错误**
+```js
+var x, y
+{x, y} = { x: 22, y: 33} //Uncaught SyntaxError: Unexpected token =
+```
+
+#### **正确**
+```js
+var x, y
+({x, y} = { x: 22, y: 33}) //Uncaught SyntaxError: Unexpected token =
+```
+
+<!-- tabs:end -->
+
+11.	解构赋值的应用
+
+<!-- tabs:start -->
+#### **从函数返回多个值**
+```js
+function f()
+{
+	return [1,2,3]
+}
+var [a,b,c] = f()
+```
+
+#### **函数参数的定义**
+```js
+function f1([a,b,c]) {} //定义有序参数
+function f2({a,b,c}) {} //定义无序参数
+```
+
+#### **从对象中提取值**
+```js
+let {id,name} = {id:1,name:"Kaz",age:18}
+```
+
+#### **遍历 Map**
+```js
+let map = new Map()
+map.set('a', 1)
+map.set('b', 2)
+for (let [key, value] of map) {
+  console.log(key + " is " + value);
+}
+```
+
+#### **模块选择性引入**
+```js
+const { a, b } = require("test")
+```
+<!-- tabs:end -->
+
+## [ES6]六.迭代器
+
+### 概念
+
+`Iterator`是一种接口，为各种不同的数据结构提供统一的访问机制。任何数据结构只要部署 `Iterator` 接口，就可以完成遍历操作。
+
+所有具有`Iterator` 接口的对象都可以通过 `for-of` 进行遍历。
+
+### 内置 `Iterator` 接口的对象
+
+!> `Object` 不一定具有 `Iterator` 接口。
+
++	`Array`
++	`Map`
++	`Set`
++	`String`
++	函数的`arguments`
++	`NodeList`
+
+### 默认的 `Iterator` 接口
+1.	默认的 `Iterator` 接口部署在数据结构的 `Symbol.iterator` 属性。只要一个数据结构只要具有 `Symbol.iterator` 属性，就可以认为是可遍历的`iterable`。
+
+2.	`Symbol.iterator` 属性是一个函数，返回一个遍历器对象，其根本特征就是具有 `next` 方法，其中 `next` 方法返回当前值 `value` 和是否完成 `done` 构成的对象。
+
+```js
+//定义一个可迭代的对象
+let a = {
+	[Symbol.iterator]() {
+		let i = 0
+		return {
+			next:function(){
+				return {
+					value: ++i,
+					done: i > 100
+				}
+			}
+		}
+	}
+}
+
+for(v of a) console.log(v) //输出前100个值
+```
+
+### 调用`Iterator` 接口的场合
+1.	解构赋值
+2.	拓展运算符
+3.	`yield*` 后面跟的是一个可遍历的结构，它会调用该结构的遍历器接口。
+4.	`for-of`
+5.	`Array.form`:可迭代对象转数组
+
+```js
+Array.from(a)
+```
+
+参考：
+
+阮一峰ES6教程 —— https://es6.ruanyifeng.com/#docs/destructuring 、https://es6.ruanyifeng.com/#docs/iterator
+
+廖雪峰的官方网站——https://www.liaoxuefeng.com/wiki/1022910821149312/1023021187855808

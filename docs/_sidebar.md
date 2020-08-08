@@ -1,6 +1,6 @@
 * [介绍](README.md)
 
-* 语言篇
+* 语言篇：语言基础
 	* HTML
 		* [杂记](html/misc.md)
 
@@ -15,12 +15,12 @@
 	* JavaScript
 		* [基础](js/base.md)
 		* [原始数据类型](js/data.md)
-		* [Array、Object、Map和Set](js/ds.md)
-		* 函数
-		* 面向对象
-		* 异步
+		* [复杂数据结构](js/ds.md)
+		* [函数](js/function.md)
+		* [面向对象](js/oop.md)
+		* [异步](js/async.md)
 		* [杂记](js/misc.md)
-* 框架篇
+* 框架篇：前端框架
 	* Vue
 		* [介绍](vue/introduction.md)
 		* [环境](vue/environment.md)
@@ -33,18 +33,19 @@
 		* [状态管理](vue/state.md)
 		* [服务端渲染](vue/ssr.md)
 
-* 环境篇
+* 环境篇：不同环境下的开发
 	* 浏览器环境
 		* DOM
 		* BOM
 		* 事件
 		* AJAX
 		* [canvas绘图](webpic/canvas.md)
-	* Node环境
-	* 微信小程序环境
 
-* 工具篇
+	* Node.js 环境
+		* [杂记](node/misc.md)
+
+* 工具篇：自动化工具
 	* WebPack
 
-* 原理篇
+* 原理篇：框架原理
 	* 待定

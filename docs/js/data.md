@@ -1,6 +1,6 @@
-JavaScript的语言类型分为 `Undefined`、`Null`、`Boolean`、`String`、`Number`、`Object`。
+JavaScript的语言类型分为 `undefined`、`null`、`Boolean`、`String`、`Number`、`Symbol`、`Object`。
 
-其中， `Undefined`、`Null`、`Boolean`、`String`、`Number`称为原始类型(*primitive type*)。
+其中， `undefined`、`null`、`Symbol`、`Boolean`、`String`、`Number`称为原始类型(*primitive type*)。
 
 ## 一.null和undefined
 `null` 和 `undefined` 是非常相似的两个值。
@@ -373,3 +373,79 @@ var str = `Dear ${name}` //Dear Li Mei
 ```
 
 <!-- tabs:end -->
+
+## [ES6]五.Symbol
+
+`Symbol`用于表示一个独一无二的值，可以作为对象的属性。
+
+### 创建Symbol
+使用 `Symbol`函数创建一个 `Symbol`：
+```js
+let s1=Symbol()
+let s2=Symbol('abc') //使用字符串标识
+
+//两个参数不同的Symbol是不同的
+Symbol('abc') == Symbol('abc') //false
+```
+
+!> 不能使用 `new` 来创建 `Symbol`
+
+### Symbol的操作
+#### 转换成其他值
+1.	`Symbol` 值不能与其他类型的值进行运算，也不能隐式转换成其他值。
+2.	`Symbol` 值可以显式转换成 `boolean` 和 `string`，但不能转换成数值：
+
+```js
+Symbol('hi').toString() //"Symbol(hi)"
+Boolean(Symbol('hello')) //true
+```
+
+#### Symbol.for
+它接受一个字符串作为参数，然后搜索有没有以该参数作为名称的 `Symbol` 值。如果有，就返回这个 `Symbol` 值，否则就新建一个以该字符串为名称的 `Symbol` 值，并将其注册到全局。
+
+```js
+let s1 = Symbol.for('kaz');
+let s2 = Symbol.for('kaz');
+
+s1 === s2 // true
+```
+
+`Symbol.for` 和 `Symbol` 的区别：
+1.	`Symbol.for` 会对参数进行登记，来实现搜索。`Symbol` 不会对参数进行登记，所以尽管参数相同，其值也不同。
+2.	 对于相同的参数名，`Symbol.for`只会生成一个 `Symbol`。而`Symbol` 每次都会生成一个新的`Symbol`。
+
+#### Symbol.keyFor
+返回一个已登记的 `Symbol` 类型值的 `key`。只支持 `Symbol.for` 创建的 `Symbol`。
+
+```js
+let s1 = Symbol.for('kaz');
+let s2 = Symbol.for('kaz');
+Symbol.keyFor(s2) //'kaz'
+```
+
+### Symbol的应用
+#### 作为对象属性的标识符
+由于每一个 `Symbol` 值都是不相等的，这意味着 `Symbol` 值可以作为标识符，用于对象的属性名，就能保证不会出现同名的属性。
+
+```js
+let name = Symbol();
+
+let o = {};
+o[name] = 'kaz'; //中括号赋值
+
+let o1 = {
+	[name]: 'kaz' //对象构造时赋值
+}
+```
+
+#### 定义一组常量
+```js
+let type = {
+	info: Symbol(),
+	warning: Symbol(),
+	danger: Symbol(),
+}
+```
+
+#### 避免常规遍历
+以 `Symbol` 值作为键名，不会被`for-in`、`Object.getOwnPropertyNames()`得到，而需要使用 `Object.getOwnPropertySymbols()`得到。
