@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "server": "docsify serve ./docs"
+    "serve": "docsify serve ./docs"
   },
   "repository": {
     "type": "git",

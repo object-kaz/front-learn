@@ -10,18 +10,112 @@
     content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <!-- Theme: Simple -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css">
+  <!--FontAwesome Icons-->
   <style>
     :root {
-      --base-font-size: 16px;
-      --theme-color: #13c2c2;
+      --base-font-size: 14px;
+      --theme-color: #a0d911;
+
+
       --sidebar-nav-link-text-decoration--hover: none;
       --sidebar-nav-link-text-decoration--active: none;
       --sidebar-nav-link-color: var(--base-color);
       --sidebar-nav-link-color--hover: var(--theme-color);
       --sidebar-nav-pagelink-transition: all .3s ease-in-out;
       --sidebar-nav-link-transition: all .3s ease-in-out;
+      --sidebar-nav-link-before-content-l3: ' ';
+      --sidebar-nav-pagelink-background-image: none;
+      --sidebar-nav-pagelink-background-image--loaded: none;
+      --sidebar-nav-pagelink-background-image--active: none;
+      --sidebar-nav-pagelink-background-image--collapse: none;
+      --sidebar-nav-link-color: var(--base-color);
+      --sidebar-nav-link-color--active: var(--theme-color);
+
       --navbar-menu-link-color--active: var(--theme-color);
       --navbar-menu-link-color--hover: var(--theme-color);
+
+      --content-max-width: 1200px;
+
+      --code-theme-background: #f6f8fa;
+      --code-inline-background: #f7f7f7;
+      --code-inline-color: #fa541c;
+
+      --link-color--hover: var(--theme-color);
+      --link-text-decoration-color--hover: var(--theme-color);
+
+      --notice-important-border-color: #f5222d;
+      --notice-important-before-color: #f5222d;
+      --notice-important-background: #fff1f0;
+    }
+
+    @font-face {
+      font-family: "Font Awesome 5 Free";
+      font-style: normal;
+      font-weight: 900;
+      font-display: auto;
+      src: url(https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/webfonts/fa-solid-900.eot);
+      src: url(https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/webfonts/fa-solid-900.eot?#iefix) format("embedded-opentype"), url(https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/webfonts/fa-solid-900.woff2) format("woff2"), url(https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/webfonts/fa-solid-900.woff) format("woff"), url(https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/webfonts/fa-solid-900.ttf) format("truetype"), url(https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/webfonts/fa-solid-900.svg#fontawesome) format("svg")
+    }
+
+    body {
+      opacity: 0.99;
+    }
+
+    a {
+      transition: all .3s ease-in-out;
+    }
+
+    .sidebar h2 {
+      font-size: 18px;
+    }
+
+    .sidebar h3 {
+      font-size: 16px;
+    }
+
+    .sidebar-nav li {
+      line-height: 30px;
+    }
+
+    .sidebar-nav li>a[href^="#/"]:not([href*="?id="]) {
+      position: relative;
+    }
+
+    .sidebar-nav li>a[href^="#/"]:not([href*="?id="])::before {
+      content: "\f105";
+      font-family: "Font Awesome 5 Free";
+      -webkit-font-smoothing: antialiased;
+      display: inline-block;
+      font-style: normal;
+      font-variant: normal;
+      text-rendering: auto;
+      line-height: 1;
+      color: #bfbfbf;
+      font-weight: 900;
+      font-size: 14px;
+      height: 16px;
+      line-height: 16px;
+      position: absolute;
+      left: 5px;
+      top: 0;
+      bottom: 0;
+      margin: auto 0;
+      transition: color .3s ease-in-out, transform .25s ease-in-out;
+    }
+
+
+    .sidebar-nav li>a[href^="#/"]:not([href*="?id="]):not(:only-child)::before,
+    .sidebar-nav li.active>a[href^="#/"]:not([href*="?id="]):not(:only-child)::before {
+      transform: rotate(90deg);
+    }
+
+    .sidebar-nav li.collapse>a[href^="#/"]:not([href*="?id="]):not(:only-child)::before,
+    .sidebar-nav li.active>a[href^="#/"]:not([href*="?id="])::before {
+      color: var(--theme-color);
+    }
+
+    .sidebar-nav li.collapse>a[href^="#/"]:not([href*="?id="]):not(:only-child)::before {
+      transform: rotate(0);
     }
   </style>
 
@@ -32,7 +126,7 @@
   <script>
     window.$docsify = {
       name: '前端开发',
-      repo: '',
+      repo: 'object-kaz/front-learn',
       search: 'auto', // 默认值
       loadSidebar: true,
       subMaxLevel: 3,
@@ -47,7 +141,7 @@
       },
       themeable: {
         readyTransition: true, // default
-        responsiveTables: true  // default
+        responsiveTables: true // default
       },
       footer: {
         copy: '<span>&copy; 2020</span>',

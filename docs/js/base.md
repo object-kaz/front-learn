@@ -1,18 +1,38 @@
 ## 一.JS概述
-js是一种运行在客户端的脚本语言。
+js是一种能够运行在浏览器、服务端等搭载JavaScript引擎的脚本语言。
 
-```mermaid
-graph TB
-JavaScript-->ECMAScript(语法:ECMAScript)
-JavaScript-->DOM(DOM:页面文档对象模型)
-JavaScript-->BOM(BOM:浏览器对象模型)
-```
+浏览器中嵌入了 JavaScript 引擎，有时也称作 JavaScript 虚拟机。
+
+### JavaScript 引擎
+
+- [V8](https://en.wikipedia.org/wiki/V8_(JavaScript_engine)) —— Chrome 和 Opera 中的 JavaScript 引擎。
+- [SpiderMonkey](https://en.wikipedia.org/wiki/SpiderMonkey) —— Firefox 中的 JavaScript 引擎。
+- Trident、Chakra：用于不同版本的 IE
+- ChakraCore：用于 Microsoft Edge
+- Nitro、SquirrelFish：用于 Safari
+
+### 编译到 JavaScript 的语言
+
+- [CoffeeScript](http://coffeescript.org/) ： JavaScript 的语法糖，语法简短，明确简洁。
+- [TypeScript](http://www.typescriptlang.org/) ：增加严格的数据类型。简化开发，用于开发复杂的系统。由微软开发。
+- [Flow](http://flow.org/) 以一种不同的方式添加了数据类型。由 Facebook 开发。
+- [Dart](https://www.dartlang.org/) ：它拥有自己的引擎用于在非浏览器环境中运行。由 Google 开发。
+
+### 兼容性问题
++	http://caniuse.com —— 每个功能都列有一个支持信息表格
++	https://kangax.github.io/compat-table —— 一份列有语言功能以及引擎是否支持这些功能的表格
+
+### 严格模式
+1.	`"use strict";` 命令用于开启严格模式。
+2.	严格模式是现代的，对以往错误特性的修改。
+3.	`"use strict";` 命令只能放在函数或文件开头处。前面不能有 任何可执行语句。
+4.	`"use strict";` 命令是不可撤销的。
 
 ## 二.运行和编写JS代码
 ### 面向浏览器
 1.	行内式：在HTML事件中插入单行或少量JS代码
 2.	内嵌式 ：将多行JS代码写到 `script` 标签中
-3.	从HTML引入外部JS文件 ：`<script>src="my.js"></script>`     适合于JS 代码量比较大的情况     
+3.	从HTML引入外部JS文件 ：`<script>src="my.js"></script>`     适合于JS 代码量比较大的情况 
 
 ### 面向Node.js
 需要安装 Node.js。
@@ -117,23 +137,121 @@ function f() {
 3.	在非严格模式下，不使用 `var` `let` `const` 声明的变量默认为全局变量。
 
 ## 五.语句
-JavaScript的语法和C语言类似，每个语句以`;`结束，语句块用`{...}`。但是，`JavaScript`并不强制要求在每个语句的结尾加`;`，浏览器中负责执行`JavaScript`代码的引擎会自动在每个语句的结尾补上`;`。
+语句是执行行为的语法结构和命令。
+### 分号
 
-### `if` 语句
-其语法和C语言是一样的。
+1.	每个语句以`;`结束，语句块用`{...}`。
+2.	`JavaScript`并不强制要求在每个语句的结尾加`;`，`JavaScript`  引擎会自动识别并在每个语句的结尾补上`;`。但存在识别出现问题的地方。
+
+
+<!-- tabs:start -->
+#### **错误案例**
+```js
+alert("There will be an error")
+
+[3, 4].forEach(alert)
+```
+引擎会自动识别成：
+```js
+alert("There will be an error")[3, 4].forEach(alert)
+```
+就会报错。
+<!-- tabs:end -->
+
+### 注释
+1.	尾注释 `//123456`
+2.	多行注释 `/*123456*/`
+3.	不支持注释嵌套。
+
+### `if-else` 语句
+其语法和`C`语言是一样的。
 
 ### `switch` 语句
-其语法和C语言是基本一样的。但`js`可以将任意类型的变量和常量作为条件， `case`后面也可以接变量。
+其语法和`C`语言是基本一样的。
+
+但`js`可以将任意类型的变量和常量作为条件， `case`后面也可以接变量。
+
+!> 注意不加 `break;`会导致代码继续向下执行。
+
+?> 通常情况下， `switch` 可以使用对象数组或`Map`进行代替。
 
 ### `while`、`do-while`、`for` 语句
-其语法和C语言也是一样的。
+其语法和 `C` 语言也是一样的。
+
+### 标号、`break`、`continue`
+
+1.	标号通常用来标记一个循环或语句块。
+
+2.	在循环中，可以在`break`、`continue`语句后面可以添加标号。
+3.	在语句块中，可以在`break`语句后面可以添加标号。（不能使用`continue`）
+4.	不能在严格模式下，标记函数和生成器函数。
+
+<!-- tabs:start -->
+#### **break跳出外层循环**
+```js
+loop1:
+for(let i = 0; i < 3; i++)
+{
+	for(let j = 0; j < 3; j++)
+	{
+		if(i==1) break loop1
+		console.log(i,j)
+	}
+}
+```
+运行结果：
+```js
+0 0
+0 1
+0 2
+```
+#### **continue跳过外层的本次循环**
+```js
+loop1:
+for(let i = 0; i < 3; i++)
+{
+	for(let j = 0; j < 3; j++)
+	{
+		if(i==1) continue loop1
+		console.log(i,j)
+	}
+}
+```
+运行结果：
+```js
+0 0
+0 1
+0 2
+2 0
+2 1
+2 2
+```
+
+#### **语句块中使用 break**
+
+> 通常使用异常处理代替这样的语句
+
+```js
+a: {
+	console.log('a')
+	break a
+	console.log('b')
+}
+console.log('c')
+```
+运行结果：
+```js
+a
+c
+```
+<!-- tabs:end -->
 
 ### `for-in`语句
 1.	用途:
 	+	遍历对象的属性名称
 	+	**遍历数组的下标**
 
-2.	格式 `for(var i in 数组/对象) 语句`
+2.	格式 `for(let i in 数组/对象) 语句`
 
 <!-- tabs:start -->
 
@@ -153,7 +271,7 @@ for(var i in [1,2,3]) console.log(i)
 
 ### [ES6]`for-of`语句
 1.	用途
-   +	**遍历可迭代对象（数组、`Map`、`Set`）的值**
+   +	**遍历可迭代对象（数组、`Map`、`Set`等）的值**
 
 2.	格式 `for(var i of 对象) 语句`
 
@@ -169,3 +287,10 @@ for(var i of [1,2,3]) console.log(i)
 3
 ```
 <!-- tabs:end -->
+
+
+
+## 参考资料
+
+1.	现代JavaScript教程——JavaScript简介——https://zh.javascript.info/intro
+2.	现代JavaScript教程——代码结构——https://zh.javascript.info/structure

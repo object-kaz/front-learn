@@ -13,7 +13,7 @@
 
 1.	克隆本项目
 2.	安装依赖 `npm install`
-3.	启动本地服务器 `npm run server`
+3.	启动本地服务器 `npm run serve`
 4.	访问本地网站 `http://127.0.0.1:3000/`
 
 

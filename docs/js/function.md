@@ -1,8 +1,7 @@
 ## 一.函数定义和调用
 
-### 函数定义
-#### function关键字定义函数
-1.	声明一个有名函数
+### 普通函数声明
+1.	函数声明
 
 ```js
 function a(text)
@@ -11,7 +10,7 @@ function a(text)
 }
 ```
 
-2.	声明一个匿名函数，再赋值给变量
+2.	函数表达式
 
 ```js
 var a = function(text){
@@ -19,9 +18,25 @@ var a = function(text){
 }
 ```
 
+3.	区别：
+	+	函数表达式是在代码执行到达时被创建，并且仅从那一刻起可用。
+	+	在函数声明被定义之前，它就可以被调用。
+
+```js
+f1() //ok
+f() //error
+var f = function() {
+	console.log(12345)
+}
+
+function f1() {
+	console.log(123456)
+}
+```
+
 !> 函数参数不需要加上变量声明的修饰符。
 
-#### 箭头函数
+### [ES6]箭头函数
 1.	声明一个箭头函数的格式
 	+	`(参数表) => 返回值`
 	+	`(参数表) => { 函数体 }`
@@ -444,7 +459,7 @@ function scheduler(task) {
   }
 }
 ```
-### 部署 Iterator接口
+#### 部署 Iterator接口
 ```js
 let a = {
     *[Symbol.iterator]() {
@@ -457,7 +472,7 @@ let a = {
 for(v of a) console.log(v) //输出前100个值
 ```
 
-### 作为数据结构使用
+#### 作为数据结构使用
 `Generator` 可以看作是一个类似数组的结构，用于 `for` 循环。
 
 ## 四.函数中的 `this`
