@@ -135,8 +135,166 @@ function f() {
 <!-- tabs:end -->
 
 3.	在非严格模式下，不使用 `var` `let` `const` 声明的变量默认为全局变量。
+4.	在全局范围内，使用 `var` 的变量会自动注册到全局对象 `globalThis` 中，而使用 `let` 和 `const` 声明的变量则不会。
+5.	`var` 可以反复声明同一个变量，但后面重复的声明会被忽略； `let` 和 `const` 只能将同一个变量声明一次。
+
+### 变量和函数提升
+1.	变量和函数声明，会被提升到作用域的顶端。
+2.	对于 `var` 声明的变量，在声明之前为 `undefined`。
+3.	对于 `let`和 `const`声明的变量，在声明之前会进入临时死区 *TDZ*。在临时死区中，变量被认为是未初始化的，访问其值会发生 `ReferenceError`。
+4.	赋值部分不会被提升。
+5.	变量的提升在函数提升之前。
+6.	非严格模式下，未使用关键字声明的变量不会被提升，在其赋值之前访问会发生 `ReferenceError`。
+
+<!-- tabs:start -->
+#### **例1**
+```js
+console.log(v1); //变量已声明，但未赋值 undefined
+var v1 = 100;
+function foo() {
+    console.log(v1); // undefined
+    var v1 = 200;
+    console.log(v1);// 200
+}
+foo();
+console.log(v1); //100
+```
+相当于：
+```js
+var v1
+function foo() {
+	var v1
+    console.log(v1); // undefined
+    v1 = 200;
+    console.log(v1);// 200
+}
+console.log(v1); //变量已声明，但未赋值 undefined
+v1 = 100;
+
+foo();
+console.log(v1); //100
+```
+#### **例2**
+```js
+ 
+var foo;
+ 
+function foo () {
+    console.log(1);
+}
+foo(); //1
+ 
+foo = function () {
+    console.log(2);
+
+```
+相当于：
+```js
+function foo () {
+    console.log(1);
+}
+var foo;
+foo(); //1
+ 
+foo = function () {
+    console.log(2);
+}
+```
+#### **例3**
+```js
+function foo() {
+  console.log(a);
+  var a = 1;
+  console.log(a);
+  function a() {}
+  console.log(a);
+  console.log(b);
+  var b = 2;
+  console.log(b);
+  function b() {}
+  console.log(b);
+}
+
+foo();
+```
+相当于：
+```js
+function foo() {
+  var a;
+  var b;
+  function a() {}
+  function b() {}
+  console.log(a); // a()
+  a = 1;
+  console.log(a); // 1
+  console.log(a); // 1
+  console.log(b); // b()
+  b = 2;
+  console.log(b); // 2
+  console.log(b);// 2
+}
+foo();
+```
+### **例4**
+```js
+function foo() {
+  console.log(a);
+  console.log(b); // 报错
+  b = 'aaa';
+  var a = 'bbb';
+  console.log(a);
+  console.log(b);
+}
+foo();
+```
+<!-- tabs:end -->
+
+### 立即调用函数表达式*IIFE*
+在 `ES6` 之前，`JavaScript` 没有块作用域，程序员们就用立即调用函数表达式来模拟块作用域。
+
+例如：
+```js
+(function(){ 
+	var name = 'kaz';
+	console.log('hi' + name)
+})()
+```
+这时，里面的变量就都在函数所在的作用域内了。
+
+#### 函数体需要加修饰
+1.	主代码流遇到 "function" 时，它会把它当成一个函数声明的开始。但函数声明必须有一个函数名，因此会报错。
+```js
+function(){ //Error: Function statements require a function name
+	console.log('hi')
+}()
+```
+
+2.	即使有名字，JavaScript 也不允许立即调用函数声明：
+
+```js
+function sayHi(){ //Error: Function statements require a function name
+	console.log('hi')
+}()
+```
+
+3.	所以需要使用圆括号把该函数表达式包起来，表示这个函数是在另一个表达式的上下文中创建的，因此它是一个函数表达式。
+
+#### 其他写法
+可以使用 `+`或`!`来代替括号：
+
+```js
+!function() {
+  alert("hi");
+}();
+
++function() {
+  alert("hi");
+}();
+```
+
 
 ## 五.语句
+
 语句是执行行为的语法结构和命令。
 ### 分号
 
@@ -290,7 +448,9 @@ for(var i of [1,2,3]) console.log(i)
 
 
 
-## 参考资料
+## 参考
 
 1.	现代JavaScript教程——JavaScript简介——https://zh.javascript.info/intro
 2.	现代JavaScript教程——代码结构——https://zh.javascript.info/structure
+3.	变量和函数提升——道廷途说：https://www.cnblogs.com/lvonve/p/9871226.html
+4.	旧时的 `var`——现代JavaScript教程：https://zh.javascript.info/var

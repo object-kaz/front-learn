@@ -549,4 +549,6 @@ typeof alert // "function"
 ```
 
 ## 参考
+
 1.	现代JavaScript教程——数据类型：https://zh.javascript.info/types
+2.	现代JavaScript教程——垃圾回收：https://zh.javascript.info/garbage-collection

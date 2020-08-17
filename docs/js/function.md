@@ -1,5 +1,5 @@
 ## 一.函数定义和调用
-
+在 `JavaScript`中，函数是一种可调用对象。
 ### 普通函数声明
 1.	函数声明
 
@@ -21,6 +21,7 @@ var a = function(text){
 3.	区别：
 	+	函数表达式是在代码执行到达时被创建，并且仅从那一刻起可用。
 	+	在函数声明被定义之前，它就可以被调用。
+	+	函数声明必须有名字，且不能立即调用。而函数表达式可以无名，可以立即调用。
 
 ```js
 f1() //ok
@@ -53,7 +54,26 @@ var f = (arg) => arg
 	2.	不可以使用`arguments`对象，该对象在函数体内不存在。如果要用，可以用 `rest` 参数代替。
 	3.	不可以使用 `yield`命令，因此箭头函数不能用作 `Generator` 函数。
 
+### new Function
+1.	使用 `new Function` 可以将一个包含`JavaScript`表达式的字符串创建为函数，其语法如下：
+```js
+new Function ([[argName1, argName2, ...argNameN], ]functionBody)
+```
+2.	`new Function` 中的函数，是全局环境下的，因此无法访问函数外部的变量。
+	
+	!> 由于 `JavaScript`程序 在发布前，通常需要对代码进行压缩，原先声明的变量会变成单个字母的变量。而 `new Function` 创建的动态代码可能在压缩后执行，这时函数内可能就无法访问外部变量(甚至全局变量都无法访问)。**因此使用这种方法创建函数时，避免使用外部和全局变量。**
+	
 
+例子：
+```js
+function hi()
+{
+	let name = "kaz"
+	return new Function('alert(name)');
+}
+
+hi()() //error
+```
 
 ### 函数的参数
 1.	一般情况下，调用函数时，按顺序传入参数即可。
@@ -110,7 +130,47 @@ function f(a,...args)
 ```
 
 7.	[ES6] 函数的参数也支持解构赋值。
+8.	`length` 属性用于获取函数参数的个数，但不包括 `rest` 参数。
 
+### 函数的名字
+`name` 属性用于获取函数的名字。
+
+1.	`name` 属性可以获取一个函数的名字。
+
+```js
+function hi() {
+  alert("Hi");
+}
+hi.name //hi
+```
+2.	命名函数表达式*NFE* 中：
+	+	`name`为函数的名字，且不会作为变量的声明。
+	+	它允许函数在内部引用自己。
+	+	它在函数外是不可见的。
+
+```js
+let sayHi = function hello() {
+  alert("Hello");
+  //可以在里面调用 hello() 
+} //这是NFE
+sayHi.name //hello
+```
+
+3.	定义函数时，若没有指定函数的名字，则会用第一个接受函数的变量来作为名字。
+
+```js
+let sayHi = function() {
+  alert("Hello");
+}
+sayHi.name //sayHi
+```
+
+4.	如果找不到名字，则 `name` 属性为空字符串。
+
+```js
+let funcs = [function(){}]
+funcs[0].name //''
+```
 
 ## 二. 闭包
 ### 概念
@@ -592,8 +652,7 @@ function a(x,y)
 a.bind(0,1)(2)
 ```
 
-
-参考：
+## 参考
 
 廖雪峰的官方网站——https://www.liaoxuefeng.com/wiki/1022910821149312/1023021250770016
 

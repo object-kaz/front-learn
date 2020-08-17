@@ -172,6 +172,8 @@ let obj = {
 2.	函数作用域
 3.	`Proxy`拦截私有属性
 
+?> 在新的标准中，使用 `class` 语法声明的类可以添加私有字段。
+
 #### 约定俗成
 
 
@@ -334,6 +336,7 @@ u.tags[3] = "cpp" // 只触发了 getter，但没有触发修改器
 
 	不同的工具和框架给出了不同的方案：
 	+	Vue2：
+	
 		1.	通过访问器属性监听对象属性的变化。
 		2.	不监听数组直接赋值(如 `vm.a[0] = 1`)引起的变化（可以实现，但官方考虑到性能问题，没有应用到框架中）。
 		3.	改写数组的方法。
@@ -341,6 +344,7 @@ u.tags[3] = "cpp" // 只触发了 getter，但没有触发修改器
 		5.	不允许在根节点上增加属性。（因为监听不了）
 	+	微信小程序：通过统一的接口 `setData` 来触发属性的变化。
 	+	Vue3：使用 `Proxy`，避免了这些问题。
+	
 		1.	直接代理对象，避免所有属性的遍历。
 		2.	不局限于`set` 和 `get`，支持对象的多种行为。
 
@@ -356,9 +360,21 @@ u.tags[3] = "cpp" // 只触发了 getter，但没有触发修改器
 	- `get` ：获取器
 	- `set` ：修改器
 	- `writable`：如果为 `true`，则值可以被修改，否则它是只可读的。
-	- `enumerable` ：如果为 `true`，则会被在循环中列出，否则不会被列出。
-	- `configurable`：如果为 `true`，则此属性可以被删除或属性描述也可以被修改，否则不可以。
+	
+		!> 非严格模式下，修改只读属性不会有任何作用，但也不会报错。
+	
+	- `enumerable` ：如果为 `true`，则会被在`for-in`循环和 `Object.keys` 中列出，否则不会被列出。
+	- `configurable`：如果为 `true`，则：
+	
+		+	不能修改 `configurable` 标志。
+		+	不能修改 `enumerable` 标志。
+		+	不能将 `writable`标志）。
+		+	不能修改访问者属性的 `get/set`（但是如果没有可以分配它们）。
+		+	不能删除
+	
 
+!> `configurable`是单向的，一旦设置为 `false` 就不可改回了。
+	
 6.	不同的描述符可拥有的键值：
 
 | 类型   | `configurable` | `enumerable` | `value` | `writable` | `get`  | `set`  |
@@ -371,7 +387,65 @@ u.tags[3] = "cpp" // 只触发了 getter，但没有触发修改器
 	+	属性值和函数的键 `value`、`get` 和 `set` 字段的默认值为 `undefined`。
 
 #### 获取属性的标志
+函数：`Object.getOwnPropertyDescriptor(obj,name)`
 
+```js
+let user = {
+  name: "kaz"
+};
+Object.getOwnPropertyDescriptor(user,'name')
+/*{
+  "value": "kaz",
+  "writable": true,
+  "enumerable": true,
+  "configurable": true
+}*/
+```
+
+#### 修改属性的标志
+1.	单个属性：`Object.defineProperty(obj,name,options)`
+2.	多个属性：``Object.defineProperties(obj,{name:options,...})``
+
+!> 这些函数也可以定义属性。
+
+```js
+let user = {
+  name: "kaz"
+};
+Object.defineProperty(user,'name',{
+	writable: false //设为只读
+})
+
+user.name = "guapi" //不会报错，但是无效
+```
+#### 全局操作
+1. `Object.preventExtensions(obj)`：禁止添加新属性。
+
+2. `Object.isExtensible(obj)`：如果添加属性被禁止，则返回 `false`，否则返回 `true`。
+
+3. `Object.seal(obj)`：禁止添加、删除、修改标志。为所有现有的属性设置 `configurable: false`。
+
+4. `Object.isSealed(obj)`：如果添加/删除属性被禁止，并且所有现有的属性都具有 `configurable: false`则返回 `true`。
+
+5. `Object.freeze(obj)`：禁止添加、删除、赋值、修改标志。为所有现有的属性设置 `configurable: false,writable: false`。
+
+6. `Object.isFrozen(obj)`：如果添加、删除、赋值、修改标志被禁止，并且所有当前属性都是 `configurable: false, writable: false`，则返回 `true`。
+
+### 属性访问和修改规则
+1.	属性访问：如果对象自身有相关属性，则直接取值；否则，从原型链中寻找相关属性；否则，返回 `undefined`。
+2.	属性修改：如果是自身属性，则直接修改；否则，会创建一个自身的属性（包括原型属性）。
+
+```js
+function A()
+{
+}
+A.prototype.name = 'kaz'
+let a = new A()
+a.name //kaz
+a.name = 'guapi'
+a.name //guapi
+a.hasOwnProperty('name') //true
+```
 
 ## 四.继承
 ### 构造函数的继承
@@ -642,7 +716,27 @@ function deepCopy(p, c) {
 　　　return c;
 }
 ```
+### Mixin
+1.	背景：`JavaScript` 只支持单继承。但会遇到例如，`PrimaryStudent` 需要由 `Primary` 和 `Student`共同继承的方法。
+2.	概念：`mixin` 是一个包含可被其他类使用而无需继承的方法的类。`mixin` 提供了实现特定行为的方法，但是不单独使用它，而是使用它来将这些行为添加到其他类中。它绕过了继承机制，实现了类似继承的功能，因此通过它可以实现伪多继承。
 
+```js
+//一个事件系统
+let eventMixin = {
+	on(name,handler){
+		//code...
+	},
+	trigger(name,handler){
+		//code...
+	}
+}
+class User {
+	//code...
+}
+//混合
+Object.assign(User.prototype, eventMixin)
+new User().on('create',() => null) //可以调用
+```
 
 ## 五.多态性
 多态最根本的作用就是通过把过程化的条件分支语句转化为对象的多态性，从而消除这些条件分支语句。
@@ -653,6 +747,101 @@ JavaScript 常见实现多态的场景：
 3.	`JavaScript` 是动态语言，一个对象可以有不同的类型，这意味着 `JavaScript` 对象的多态性是与生俱来的。
 
 ## [ES6]六.class 创建对象
+
+!> 这只是 `JavaScript` 现有的基于原型的继承的语法糖。
+
+### 定义类
+1.	通过类声明定义类
+
+```js
+class A {
+	constructor(a)
+	{
+		this.a = a
+	}
+}
+```
+
+2.	通过类表达式定义类
+
+```js
+// 匿名类
+let A1 = class {
+	constructor(a)
+	{
+		this.a = a
+	}
+}
+
+// 具名类
+let A2 = class B{
+	constructor(a)
+	{
+		this.a = a
+	}
+}
+
+```
+3.	函数声明和类声明的区别：
+	+	函数声明会提升，类声明不会。
+	+	通过类声明声明的 `class` ，必须使用 `new` 来创建对象。
+4.	**类体内的语句均在严格模式下执行**。比如，构造函数，静态方法，原型方法，getter和setter都在严格模式下执行。当调用静态或原型方法时没有指定 `this` 的值，那么方法内的 `this` 值将被置为 `undefined`。
+
+### 定义属性和方法
+1.	`constructor` 方法(构造函数)是一个特殊的方法，这种方法用于创建和初始化一个由 `class` 创建的对象。
+2.	在类体内定义的方法默认为原型方法。
+3.	在类体内，使用 `get`和 `set` 定义访问器。
+4.	使用 `static` 关键字定义静态方法。调用静态方法不需要实例化该类，但不能通过一个类实例调用静态方法。
+
+```js
+class A {
+	static name()
+	{
+		return 'A'
+	}
+}
+A.name()
+```
+
+5.	实例的属性一般定义在方法内，静态的或原型的数据属性必须定义在类定义的外面。
+
+```js
+class Box {
+	constructor(length)
+	{
+		this.length = length
+	}
+}
+Box.staticHeight = 80;
+Box.prototype.prototypeHeight = 100;
+```
+
+### 公有和私有字段
+!> 这是一项试验性功能，引擎可能不支持。
+
+1.	在类体内，方法外可以声明公有字段。
+2.	在类体内，方法外可以使用 `#` 前缀声明私有字段。
+3.	私有字段只能在类内访问，类外不可见。
+4.	私有字段必须在字段声明中预先定义。 
+
+```js
+class Rectangle {
+  height = 0;
+  width = 1;
+  #pheight = 30; //私有属性
+  #pmethod() //私有方法
+  {
+  
+  }
+}
+```
+
+### 继承
+1.	`extends` 关键字在 *类声明 *或 *类表达式* 中用于创建一个类作为另一个类的一个子类。
+2.	如果基类有构造函数，则子类的构造函数在使用 `this` 前必须调用 `super()` 来执行基类的构造函数。如果子类没有构造函数，则构造对象时，使用的是基类构造函数。
+3.	可以继承使用 `class` 生成的类，也可以继承使用传统基于构造函数的类。**但不能继承常规对象。**
+4.	继承的类可以通过 `super` 关键字调用基类的方法。 如`super.hi()`。
+5.	子类的同名函数会覆盖基类的同名函数，但通过 `super` 关键字仍然可以调用基类的函数。
 
 ## [ES6]七.Proxy
 
@@ -666,6 +855,8 @@ JavaScript 常见实现多态的场景：
 5.	为什么Vue3.0使用Proxy实现数据监听(defineProperty表示不背这个锅)——脚本之家：https://www.jb51.net/article/171869.htm
 6.	记一次思否问答的问题思考：Vue为什么不能检测数组变动——segmentfault：https://segmentfault.com/a/1190000015783546
 7.	defineProperty——MDN:https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+8.	属性标志和属性描述符——现代JavaScript教程：https://zh.javascript.info/property-descriptors
+9.	类：MDN:https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Classes
 
 
 
