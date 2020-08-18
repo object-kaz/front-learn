@@ -26,6 +26,7 @@
 	* [性能与内存管理](js/performence-memory.md)
 	* 常用对象
 	* [代码风格](js/code-style.md)
+	* [ES新特性](js/es.md)
 	* [杂记](js/misc.md)
 
 ----

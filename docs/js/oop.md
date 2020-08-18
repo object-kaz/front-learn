@@ -844,8 +844,109 @@ class Rectangle {
 5.	子类的同名函数会覆盖基类的同名函数，但通过 `super` 关键字仍然可以调用基类的函数。
 
 ## [ES6]七.Proxy
+### 概念
+1.	`Proxy` 在对象与用户访问之间架设一层拦截，使得外界的访问必须通过这层拦截。它用于修改对象操作的默认行为，属于一种元编程。
+
+2.	`Proxy`与访问器和逐个`defineProperty`的区别：
+	+	粒度差异：`Proxy` 监控的是整个对象，而`defineProperty`操作的是对象的属性。
+	+	`Proxy` 可以检测到属性的新增和删除，而`defineProperty`检测不到。
+	+	`Proxy` 支持检测更多的操作，而`defineProperty`只能检测有限的操作。
+
+3.	兼容性：只有`Proxy`的少部分功能可以通过 `polyfill`来兼容旧浏览器。
+4.	`this`：指向`Proxy` 实例。有些原生对象的内部属性，只有通过正确的 `this` 才能拿到。
+
+### 创建 Proxy
+创建代理的方法：
+```js
+var proxy = new Proxy(target, handler);
+```
+其中 `target` 是一个对象，`handler` 是包含拦截操作处理函数的对象。
+
+### 拦截操作
+
+#### 参数解释
+
+|名称|解释|
+|----|----|
+|`target`|目标对象|
+|`propKey`|键|
+|`receiver`|原始的操作行为所在的那个对象，一般情况下是`proxy`实例本身|
+|`value`|新值|
+|`propDesc`|属性描述符|
+|`args`|函数参数|
+|`ctx`|函数中的 `this`|
+|`proto`|原型对象|
+
+#### 获取型操作
+
+|拦截操作|参数|拦截内容|返回值|注意|
+|----|----|----|----|----|
+|**get**|target, <br>propKey, <br>receiver|`proxy.foo`<br>`proxy['foo']`|得到的数据||
+|**has**|target, <br>propKey, <br>receiver|`propKey in proxy`|布尔值|1. 如果原对象不可配置或者禁止扩展，`has`拦截会报错。<br>2. 此操作对for...in循环不生效<br>3. 此方法不判断属性是否是从原型继承的|
+|**ownKeys**|target|`Object.getOwnPropertyNames(proxy)`<br>`Object.getOwnPropertySymbols(proxy)`<br>`Object.keys(proxy)`<br>`for...in`循环|数组|1.	使用`Object.keys()`方法时，有三类属性会被 `ownKeys`方法自动过滤，不会返回:<br>	- 目标对象上不存在的属性<br>	- 属性名为 Symbol 值<br>	- 不可遍历（enumerable）的属性<br>2.	返回的数组成员，只能是字符串或 Symbol 值，否则报错<br>3. 如果目标对象自身包含不可配置的属性，则该属性必须被`ownKeys()`方法返回，否则报错<br>4. 如果目标对象是不可扩展的，这时返回的数组之中，必须包含原对象的所有属性，且不能包含多余的属性|
+|**getOwnPropertyDescriptor**|target, <br>propKey|`Object.getOwnPropertyDescriptor(proxy, propKey)`|属性的描述对象||
+|**getPrototypeOf**|target|`Object.getPrototypeOf(proxy)`<br>`instanceof`<br>`Object.prototype.isPrototypeOf()`|对象||
+|**isExtensible**|target|`Object.isExtensible(proxy)`|布尔值|只有目标对象不可扩展时才可以返回 `true`|
+
+#### 修改型操作
+?> 修改型操作的返回值为 **布尔值**，表示操作是否成功。
+
+|拦截操作|拦截内容|注意|
+|----|----|----|
+|**set(target, propKey, value, receiver)**|`proxy.foo = v`<br>`proxy['foo'] = v`|1. 若属性不可写且不可配置，此方法将不起作用<br>2. 严格模式下，`set`如果没有返回true，就会报错|
+|**deleteProperty(target, propKey)**|`delete proxy[propKey]`||
+|**defineProperty(target, propKey, propDesc)**|`Object.defineProperty(proxy, propKey, propDesc)`||
+|**preventExtensions(target)**|`Object.preventExtensions(proxy)`||
+|**setPrototypeOf(target, proto)**|`Object.setPrototypeOf(proxy, proto)`|如果目标对象不可扩展,则不能改变目标对象的原型|
 
 
+#### 函数调用操作
+
+|拦截操作|拦截内容|返回值|
+|----|----|----|
+|**apply(target, ctx, args)**|`proxy(...args)`<br>`proxy.call(ctx, ...args)`<br>`proxy.apply(ctx,args)`|函数返回值|
+|**construct(target, args)**|`new obj(...args)`|函数返回值|
+
+## [ES6]八.反射
+### 概念
+1.	`Reflect` 是为了操作对象而提供的 API。
+2.	`Reflect` 将`Object` 对象的一些明显属于语言内部的方法（比如 `Object.defineProperty` ），放到Reflect对象上。
+3.	`Reflect` 修改某些 `Object` 方法的返回结果，让其变得更合理。
+4.	`Reflect` 让 `Object` 操作都变成函数行为。
+5.	`Reflect` 对象的方法与 `Proxy` 对象的操作方法一一对应，只要是 `Proxy` 对象的操作方法，就能在 `Reflect` 对象上找到对应的方法。
+
+### 方法
+
+!> 如果第一个参数不是对象，则这些方法会报错(而Object的版本会转换成对象，不报错)。
+
+#### 获取型操作
+
+|操作|参数|等价操作|描述|
+|----|----|----|----|
+|**get**|target, <br>name, <br>receiver|`obj.foo`<br>`obj['foo']`|查找并返回`target`对象的`name`属性，如果没有该属性，则返回 `undefined` 。|
+|**has**|target, <br>name, <br>receiver|`propKey in obj`|无|
+|**ownKeys**|target|`Object.getOwnPropertyNames(proxy)`<br>`Object.getOwnPropertySymbols(proxy)`<br>`Object.keys(proxy)`<br>`for...in`循环|返回对象的所有属性（包括`symbols`）|
+|**getOwnPropertyDescriptor**|target, <br>name|`Object.getOwnPropertyDescriptor(proxy, propKey)`|获取属性描述符。|
+|**getPrototypeOf**|target|`Object.getPrototypeOf(proxy)`<br>`instanceof`<br>`Object.prototype.isPrototypeOf()`|获取对象的原型。|
+|**isExtensible**|target|`Object.isExtensible(proxy)`|对象是否可以拓展|
+
+#### 修改型操作
+?> 修改型操作的返回值为 **布尔值**，表示操作是否成功。
+
+|操作|等价操作|描述|
+|----|----|----|
+|**set(target, name, value, receiver)**|`proxy.foo = v`<br>`proxy['foo'] = v`|1. 设置 `target` 对象的 `name` 属性等于 `value`<br>2. 若属性为`setter`，则`receiver`指定`setter`函数的`this`<br>3. 如果将`receiver`设置为 `Proxy`，那么 `Reflect.set` 会触发`Proxy.defineProperty`拦截。 |
+|**deleteProperty(target, name)**|`delete obj[name]`|删除对象的属性。<br>如果删除成功，或者被删除的属性不存在，返回true<br>删除失败，被删除的属性依然存在，返回false|
+|**defineProperty(target, name, propDesc)**|`Object.defineProperty(proxy, propKey, propDesc)`|定义属性。|
+|**preventExtensions(target)**|`Object.preventExtensions(proxy)`|使对象不可拓展。|
+|**setPrototypeOf(target, proto)**|`Object.setPrototypeOf(proxy, proto)`|设置原型。|
+
+#### 函数调用操作
+
+|操作|等价操作|描述|
+|----|----|----|
+|**apply(target, thisArg, args)**|`obj(...args)`<br>`proxy.call(ctx, ...args)`<br>`obj.apply(ctx,args)`|函数调用|
+|**construct(target, args)**|`new obj(...args)`|构造对象<br>如果第一个参数不是函数，会报错。|
 
 ## 参考
 1.	阮一峰的网络日志——http://www.ruanyifeng.com/blog/2010/05/object-oriented_javascript_inheritance.html
@@ -856,7 +957,9 @@ class Rectangle {
 6.	记一次思否问答的问题思考：Vue为什么不能检测数组变动——segmentfault：https://segmentfault.com/a/1190000015783546
 7.	defineProperty——MDN:https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
 8.	属性标志和属性描述符——现代JavaScript教程：https://zh.javascript.info/property-descriptors
-9.	类：MDN:https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Classes
+9.	类——MDN:https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Classes
+10.	Proxy——阮一峰ES6教程：https://es6.ruanyifeng.com/#docs/proxy
+11.	Reflect——阮一峰ES6教程：https://es6.ruanyifeng.com/#docs/reflect
 
 
 

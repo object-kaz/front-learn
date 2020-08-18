@@ -19,10 +19,11 @@ arr(Array)-->aprototype(Array.prototype)-->oprototype(Object.prototype)-->null(n
 ### 创建数组的方法
 1.	使用`[]`语法：`var arr = [1,2,3,4,"hi"]`
 2.	使用 `new`语法： `var arr = new Array(1,2,3,4)`
+3.	[ES6]使用 `Array.of`方法：`var arr = Array.of(1,2,3,4)`
 
 !> 对于`Number`、`Boolean` 和 `string`， 直接使用字面量和 `new` 得到的数据类型是不一样的。其中前者为原始类型，后者为对象。但对于数组，这两种方法得到的都是对象。
 
-!> 当使用 `new` 语法时，只传入一个参数，会被函数当做数组的大小。
+!> 当使用 `new` 语法时，只传入一个参数，会被函数当做数组的大小。而使用 `Array.of` 则不会。
 
 ### 常用数组操作
 #### 获取长度
@@ -43,6 +44,11 @@ arr(Array)-->aprototype(Array.prototype)-->oprototype(Object.prototype)-->null(n
 |`arr.push(val1,val2,...)`|向数组末尾追加多个元素。|
 |`arr.unshift(val1,val2,...)`|向数组开头追加多个元素。|
 
+#### [ES6]填充元素
+|方法|说明|
+|----|----|
+|`arr.fill(value,start = 0,end = arr.length)`|在[`start`,`end`)范围内填充`value`。|
+
 #### 删除元素
 
 |方法|说明|
@@ -56,6 +62,7 @@ arr(Array)-->aprototype(Array.prototype)-->oprototype(Object.prototype)-->null(n
 |方法|说明|
 |----|----|
 |`arr.splice(index,num,val1,val2,val3,...)`|将 `index` 开始，`num`个数目的值替换成 `val1,val2,...`。返回被删除的值构成的数组。|
+|`arr.copyWithin(target,start = 0,end = arr.length)`|浅复制数组的`[start,end)`到同一数组中的以 `target` 开头的位置。支持负整数。|
 
 #### 查找元素
 |方法|说明|
@@ -212,7 +219,7 @@ for (let val of [1,2,3,4,5]) console.log(val)
 <!-- tabs:end -->
 
 
-#### find 方法
+#### [ES6]`find` 和 `findIndex` 方法
 `find`方法传入一个函数，返回函数值为 `true` 时的第一个元素（且不会继续执行函数）。传入函数的参数为 `currentValue`(当前值)、`index`(索引)、`array`(整个数组)。找不到元素时返回 `undefined`。
 
 <!-- tabs:start -->
@@ -276,6 +283,27 @@ iterator.next(); /*{ value: undefined, done: true }*/
 ```
 `iterator` 可以使用 `for-of` 循环，也可以使用 `iterator.next()`方法进行迭代。
 
+### entries 方法
+返回所有由`[key,value]`构成的迭代器。
+
+### 转换成数组
+#### `Array.form` 方法
+将可迭代对象和伪数组对象转换成数组。
+
++	可迭代对象：有迭代器接口的对象。如 `Map`、`Set`。
++	伪数组对象：拥有一个 `length` 属性和若干索引属性的任意对象。如 `arguments`。
+
+原型：`Array.form(obj[,mapper,thisArg])`
+
+参数：
++	`obj`：要转换成数组的对象
++	`mapper`：新数组中的每个元素会执行的回调函数
++	`thisArg`：回调函数的`this`
+
+```js
+Array.from('foo'); //['f','o','o']
+```
+
 ## 二.Object
 JavaScript的对象是一种 **无序的集合数据类型**，它由若干 **键值对** 组成。其中，值可以是任意类型，但键只能是**字符串**和 **Symbol**。
 
@@ -330,6 +358,13 @@ let obj = {a:1}
 
 delete obj.a
 ```
+
+#### [ES6]对象合并
+`Object.assign(obj,obj1,...)`：将所有**可枚举属性**的值从一个或多个源对象(`obj1,...`)复制到目标对象`obj`。
+
+1.	目标对象中相同键会被源对象覆盖。
+2.	`String` 类型和 `Symbol` 类型的属性都会被拷贝。
+3.	继承来的属性不会被拷贝。
 
 ### 对象遍历与迭代
 #### for-in循环
