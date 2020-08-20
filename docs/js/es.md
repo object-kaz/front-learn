@@ -78,3 +78,5 @@
 1.	BigInt：[原始数据类型](js/data.md)
 2.	对象的公有和私有字段：[面向对象](js/oop.md)
 3.	`??`(空值合并)和`?.`运算符：[原始数据类型](js/data.md)
+4.	Promise.any[异步](js/async.md)
+5.	Promise.allSettled[异步](js/async.md)

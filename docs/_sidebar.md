@@ -22,7 +22,7 @@
 	* [函数](js/function.md)
 	* [面向对象](js/oop.md)
 	* [异步](js/async.md)
-	* 模块化
+	* [模块化](js/module.md)
 	* [性能与内存管理](js/performence-memory.md)
 	* 常用对象
 	* [代码风格](js/code-style.md)
