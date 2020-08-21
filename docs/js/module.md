@@ -1,3 +1,5 @@
+# 模块化
+
 ## 一.为什么需要模块化
 1.	很早的时候，所有开发者把`Javascript`代码都写在一个文件里面，浏览器执行时，只要加载这一个文件就够了。
 2.	到了后来，代码规模增加，一个网页代码往往需要加载多个文件。
@@ -72,7 +74,7 @@ let mod = function(mod){
 }(window.mod || {}) //宽放大模式
 // }(mod) 放大模式
 ```
-## 三.CommonJS规范和Node.js
+## 三.CommonJS规范
 ### 概述
 1.	`CommonJS` 是一种被广泛使用的js模块化规范，核心思想是通过 `require` 方法来**同步加载**依赖的其他模块，通过 `module.exports` 导出需要暴露的接口。
 2.	`CommonJS`规范适合服务端，不适用于浏览器环境。
@@ -161,7 +163,7 @@ a2
 b2
 ```
 
-## 四.AMD规范和RequireJS
+## 四.AMD：RequireJS的模块规范
 
 > AMD(Asynchronous Module Definition,异步模块定义)
 
@@ -174,7 +176,7 @@ b2
 4.	 `requireJS`为`AMD`规范的实现。
 
 ### 加载模块
-1.	引入`require.js`： `<script src="js/require.js" data-main="js/main"></script>` ，其中 `data-main`用于指定主模块，即加载 `js/main.js`。
+1. 引入文件`require.js`： `<script src="js/require.js" data-main="js/main"></script>` ，其中 `data-main`用于指定主模块，即加载 `js/main.js`。
 
 ```js
 //定义模块：hello.js
@@ -230,7 +232,7 @@ require.config({
 })
 ```
 
-## 五.CMD模块规范和SeaJS
+## 五.CMD:SeaJS的模块规范
 
 > CMD(Common Module Definition,通用模块定义)
 
@@ -240,10 +242,10 @@ require.config({
 3.	SeaJS中的模块加载器，在模块代码执行之前，对模块代码进行静态分析，并动态生成依赖列表。
 4.	AMD和CMD规范的异同：
 
-|方案|优势| 劣势|特点|
-|----|----|----|----|
-|AMD|快|会浪费资源|预先加载所有的依赖，直到使用的时候才执行|
-|CMD|资源浪费少|性能较差|只有真正需要才加载依赖|
+|方案|设计|优势| 劣势|特点|
+|----|----|----|----|----|
+|AMD|依赖前置、提前执行|快|会浪费资源|预先加载所有的依赖，直到使用的时候才执行|
+|CMD|依赖就近、延迟执行|资源浪费少|性能较差|只有真正需要才加载依赖|
 
 5.	`seajs` 中启动一个模块：`seajs.use('./main')` 会自动加载 `./main.js`
 
@@ -306,7 +308,12 @@ require.async(['./a','./b'], (a, b) => null)
 |`dependencies`|当前模块的依赖|
 |`exports`|当前模块对外提供的接口。（对其的赋值必须同步执行）|
 
-## 六.ESM：ES6模块规范
+## 六.UMD规范
+1.	UMD *Universal Module Definition*，是一种 `javascript` 通用模块定义规范，让模块能在 `javascript` 所有运行环境中发挥作用。
+2.	UMD 采用 `IIFE` 来实现，其提供的立即调用函数为 `function (root, factory){}`
+3.	UMD官方主页： https://github.com/umdjs/umd
+
+## 七.ESM：ES6模块规范
 1.	ES6 模块的设计思想是尽量的静态化，模块在编译时期加载，提高运行效率，便于静态分析。而`CommonJS` 只能在运行时进行加载。
 2.	ES6 模块自动开启了严格模式。
 
@@ -435,6 +442,9 @@ export { default } from 'a'
 ```
 
 ### [ES2020]import()
+
+!> `import()` 只是一种特殊语法，只是恰好使用了括号，而不是一个函数。
+
 1.	`import` 用于动态加载一个模块，其返回值为 `Promise` 对象。
 ```js
 import(specifier)
@@ -448,6 +458,7 @@ import('...').then(({default: btn}) =< {
 })
 ```
 4.	适用场合：按需加载、条件加载、动态模块路径
+
 
 ### Module 的加载
 #### 浏览器中加载
@@ -471,7 +482,9 @@ import('...').then(({default: btn}) =< {
   // other code
 </script>
 ```
-### nodejs中加载
+3.	动态导入 `import()`可以设置 `script type="module"`
+
+#### nodejs中加载
 1.	`Node.js v13.2` 版本开始，`Node.js` 已经默认打开了 ES6 模块支持。
 2.	脚本文件里面使用 `import` 或者 `export` 命令，必须使用 `.mjs` 为后缀。
 3.	也可以在 `package.json` 中加入：
@@ -485,6 +498,51 @@ import('...').then(({default: btn}) =< {
 
 4.	`.mjs` 文件总是以 ES6 模块加载，`.cjs` 文件总是以 CommonJS 模块加载，`.js` 文件的加载取决于`package.json` 里面 `type` 字段的设置。
 
+5.	在 `CommonJS` 文件中加载 `esm` 模块： `import()` 异步加载
+
+```js
+//a.mjs
+export function esmModuleA() {
+  return 'I am ESM Module A';
+};
+
+export default esmModuleA;
+
+//index.js
+async function main() {
+  const {
+    esmModuleA
+  } = await import('./a.mjs');
+  console.log(esmModuleA());
+}
+main();
+```
+运行命令(nodejs12)：
+```shell
+node --experimental-modules index.js
+```
+
+6.	在 `ES6` 中加载 `CommonJS` 模块：只能全局导入
+
+```js
+// a.js
+module.exports = function () {
+  return 'I am CJS module A';
+};
+// index.mjs
+import cjsModuleA from './a.js';
+console.log(cjsModuleA());
+```
+运行命令(nodejs12)：
+```shell
+node --experimental-modules index.mjs
+```
+
+### ESM和 CJS 的区别
++	CommonJS 模块输出的是一个值的拷贝，ES6 模块输出的是值的引用。因此，CJS模块检测不到 模块的内部变化。
++	CommonJS 模块是运行时加载，ES6 模块是编译时输出接口。
++	CommonJS 模块的 `require()` 是同步加载模块，ES6 模块的 `import` 命令是异步加载，有一个独立模块依赖的解析阶段。
+
 ## 参考
 1.	Javascript模块化编程（一）：模块的写法——阮一峰的网络日志：http://www.ruanyifeng.com/blog/2012/10/javascript_module.html
 2.	Javascript模块化编程（二）：AMD规范——阮一峰的网络日志：http://www.ruanyifeng.com/blog/2012/10/asynchronous_module_definition.html
@@ -497,3 +555,4 @@ import('...').then(({default: btn}) =< {
 9.	前端模块化开发的价值——seajs/seajs：https://github.com/seajs/seajs/issues/547
 10.	Module 的语法——阮一峰ES6教程：https://es6.ruanyifeng.com/#docs/module
 11.	Module 的加载实现——阮一峰ES6教程：https://es6.ruanyifeng.com/#docs/module-loader
+12.	Node.js 12 中的 ES 模块——前端先锋:https://zhuanlan.zhihu.com/p/75326798
