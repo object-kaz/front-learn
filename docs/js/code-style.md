@@ -1,6 +1,8 @@
 ?> 规则是建议性的
 
-## 一.语法风格
+## 一.代码风格
+
+### 语法风格
 
 1. 函数参数之间有一个空格。
 2. 函数名与圆括号之间、圆括号与参数之间没有空格。
@@ -14,7 +16,7 @@
 10. 嵌套调用两边各一个空格。
 11. `} else {` 不空行 。
 
-## 二.避免忍者代码
+### 避免忍者代码
 1.	避免简洁导致的晦涩
 2.	避免一个字母的变量、模糊的命名、缩写和过于抽象的变量。
 3.	避免同一类功能使用同义词命名，如 `displayName` 和 `showList`。
@@ -25,23 +27,30 @@
 8.	避免返回非标准的函数。如 `isReady` 没有返回 `true` 和 `false`。
 
 
-## 三.常见的规范工具
-### 风格指南
+### 代码规范工具
+#### 风格指南
 
 - [Google JavaScript 风格指南](https://google.github.io/styleguide/jsguide.html)
 - [Airbnb JavaScript 风格指南](https://github.com/airbnb/javascript)
 - [Idiomatic.JS](https://github.com/rwaldron/idiomatic.js)
 - [StandardJS](https://standardjs.com/)
 
-### 自动规范工具
+#### 自动规范工具
 
 - [JSLint](http://www.jslint.com/)
 - [JSHint](http://www.jshint.com/) 
 - [ESLint](http://eslint.org/) 
 
+## 二.单一职责原则
+
+## 三.最少知识原则
+
+## 四.开放-封闭原则
 
 ## 参考
 
 1. 现代JavaScript教程——编码风格：https://zh.javascript.info/coding-style
 2. 现代JavaScript教程——忍者代码：https://zh.javascript.info/ninja-code
+3. JavaScript设计模式与开发实践——曾探
+
 

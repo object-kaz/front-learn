@@ -24,8 +24,9 @@
 	* [异步](js/async.md)
 	* [模块化](js/module.md)
 	* [性能与内存管理](js/performence-memory.md)
-	* 常用对象
-	* [代码风格](js/code-style.md)
+	* [常用对象](js/jsapi.md)
+	* [代码风格和设计原则](js/code-style.md)
+	* [设计模式](js/design.md)
 	* [ES新特性](js/es.md)
 	* [杂记](js/misc.md)
 
