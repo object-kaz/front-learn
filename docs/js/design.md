@@ -188,10 +188,98 @@ function calculate(sign,num1,num2)
 2.	需要了解所有策略之间的不同点
 
 ## 三.代理模式
+1.	概念：代理模式是为一个对象提供一个代用品或占位符，以便控制对它的访问
+2.	核心：当客户不方便直接访问一个对象或者不满足需要的时候，提供一个替身对象来控制对这个对象的访问，客户实际上访问的是替身对象。替身对象对请求做出一些处理之后，再把请求转交给本体对象。
+3.	类型：
+	+	保护代理：控制不同权限的对象对目标对象的访问。
+	+	虚拟代理：控制访问创建开销大的资源。
+	+	缓存代理：为一些开销大的运算结果提供暂时的存储，在下次运算时，如果传递进来的参数跟之前一致，则可以直接返回前面存储的运算结果。
+4.	优点：基本上不需要改变被代理的对象，通过代理行为，为系统添加了新的行为。
+5.	要求：代理对象和被代理对象在接口上一致。其优点：
+	+	用户可以放心地请求代理，他只关心是否能得到想要的结果
+	+	在任何使用本体的地方都可以替换成使用代理
+6.	典型实现： `Proxy`
+7.	应用：
+	+	用访问器属性代理数据属性实现数据响应式
+	+	延迟加载开销大的数据（如大图、很大的的 `js` 文件）
+	+	缓存开销大的算法结果
+
+#### 实例：图片懒加载
+<!-- tabs: start -->
+#### **不使用代理**
+```js
+var MyImage = (function(){ 
+ var imgNode = document.createElement( 'img' ); 
+ document.body.appendChild( imgNode ); 
+ var img = new Image; 
+ img.onload = function(){ 
+ 	imgNode.src = img.src; 
+ }; 
+ return { 
+ setSrc: function( src ){ 
+ 		imgNode.src = 'loading.gif'; 
+ 		img.src = src; 
+ 	} 
+ } 
+})(); 
+MyImage.setSrc( 'https://wwww.xxx.com/img.gif' );
+```
+缺点：`MyImage` 对象不仅负责设置属性，还要负责加载图片，不利于单一职责原则。
+
+#### **使用代理**
+```js
+var myImage = (function(){ 
+ var imgNode = document.createElement( 'img' ); 
+ document.body.appendChild( imgNode ); 
+ return { 
+ 	setSrc: function( src ){ 
+ 		imgNode.src = src; 
+ 	} 
+ } 
+})(); 
+var proxyImage = (function(){ 
+ var img = new Image; 
+ img.onload = function(){ 
+ 	myImage.setSrc( this.src ); 
+ } 
+ return { 
+ 	setSrc: function( src ){ 
+ 		myImage.setSrc( 'loading.gif' ); 
+ 		img.src = src; 
+ 	} 
+ } 
+})(); 
+proxyImage.setSrc( 'https://wwww.xxx.com/img.gif' );
+```
+优点：设置属性和负责加载图片分布在两个对象中，当不再需要预加载时，可以直接把工作移交给本体。
+
+<!-- tabs: end -->
+
+#### 实例：缓存代理
+
+```js
+//计算阶乘
+function fact(n)
+{
+	return n > 1 ? n * fact(n-1) : 1
+}
+
+//带缓存的代理函数
+let cachedFact = (function(){
+	let cache = new Map()
+	return function(n){
+		if(!cache.has(n))
+			cache.set(n,fact(n))
+		return cache.get(n)
+	}
+})()
+
+```
+
 
 ## 四.迭代器模式
 
-## 五.发布-订阅模式
+## 五.发布-订阅模式(观察者模式)
 
 ## 六.命令模式
 
