@@ -69,9 +69,9 @@ let Event = (function () {
 })()
 
 // cjs module system
-if (module && module.exports)
+if (typeof module === 'object')
   module.exports = Event
-else if (define) {
+else if (typeof define === 'function') {
   // cmd module system
   if (define.cmd)
     define(function (require, exports, module) {
