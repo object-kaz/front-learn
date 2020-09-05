@@ -7,7 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
-    "serve": "docsify serve ./docs"
+    "serve": "docsify serve ./docs",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -25,5 +26,8 @@
   "homepage": "https://github.com/object-kaz/front-learn#readme",
   "devDependencies": {
     "docsify-cli": "^4.4.1"
+  },
+  "dependencies": {
+    "jest": "^26.4.2"
   }
 }

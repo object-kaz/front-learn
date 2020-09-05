@@ -278,8 +278,115 @@ let cachedFact = (function(){
 
 
 ## 四.迭代器模式
+1.	概念：迭代器模式是指提供一种方法顺序访问一个聚合对象中的各个元素，而又不需要暴露该对象的内部表示。
+2.	顺序：正序、倒序
+
+### 内部迭代器
+1.	概念：函数内部已经定义好了迭代规则，它完全接手整个迭代过程。外部只需要一次初始调用。
+
+2.	优点：调用方便、无需关注内部实现
+
+3.	缺点：外部无法干涉内部的迭代规则，如迭代到某一对象时终止。
+4.	典型实现：迭代器接口 `Symbol.iterator`、数组操作 `map` `reduce` `filter`
+
+#### 示例：迭代一个数组
+```js
+let each = function(array,callback) {
+	for(let i in array)
+		callback(array[i], i, array)
+}
+each([1,3,5,7,9],(val, i, array) => console.log(val,i,array))
+```
+
+#### 示例：迭代一个链表
+```js
+function Node(data,next = null){
+	this.next = next
+	this.data = data
+}
+
+function LinkedList(array = []){
+	let lastNode = null
+	this.head = null
+	this.length = array.length
+	for(let data of array) {
+		if(!this.head) lastNode = this.head = new Node(data)
+		else {
+			lastNode.next = new Node(data)
+			lastNode = lastNode.next
+		}
+	}
+}
+
+LinkedList.prototype.each = function(callback) {
+	let current = this.head
+	let i = 0
+	while(current != null){
+		callback(current.data, i, this)
+		i++
+		current = current.next
+	}
+}
+new LinkedList([1,3,5,7,9]).each((val, i, list) => console.log(val,i,list))
+```
+### 外部迭代器
+1.	外部迭代器必须显式地请求迭代下一个元素。
+2.	优点：增强了迭代器的灵活性，可以手工控制迭代过程
+3.	缺点：增加了一些调用的复杂度
+4.	典型实现： `Generator`
+
+#### 示例：迭代一个链表
+```js
+function Node(data,next = null){
+	this.next = next
+	this.data = data
+}
+
+function LinkedList(array = []){
+	let lastNode = null
+	this.head = null
+	this.length = array.length
+	for(let data of array) {
+		if(!this.head) lastNode = this.head = new Node(data)
+		else {
+			lastNode.next = new Node(data)
+			lastNode = lastNode.next
+		}
+	}
+}
+
+LinkedList.prototype.values = function*() {
+	let current = this.head
+	let i = 0
+	while(current != null){
+		yield current.data
+		i++
+		current = current.next
+	}
+}
+new LinkedList([1,3,5,7,9]).values().next()
+```
+### 终止迭代器
+1.	提供一种跳出迭代器循环的方法。
+2.	典型实现： `Generator`对象的 `return` 方法，`break`
 
 ## 五.发布-订阅模式(观察者模式)
+1.	概念：定义对象间的一种一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都将得到通知。
+2.	在`JavaScript`中，通常用事件模型代替发布-订阅模式。
+3.	优点：
+	+	时间解耦合：不必一直监听对象状态改变。当对象状态改变时，相关函数会自动执行。
+	+	对于异步调用，可以选择用户需要的事件进行订阅，而不必传入很多的回调。
+	+	可以添加无限的订阅者，而无需修改原对象的代码。
+	+	只要事件名不改变，发布者内部代码的修改不影响订阅者。
+	+	对象解耦合：多个对象可以自由地联系到一起。
+	+	可以实现对象之间的通信。
+4.	缺点：对象与对象之间的联系较弱，不容易跟踪 `bug`。
+5.	全局发布、订阅模式：事件对象作为中介，联系订阅者和发布者。
+	+	缺点：对象与对象之间的联系不清晰。
+6.	先发布，后订阅：建立一个存放离线事件的堆栈，当事件发布的时候，如果此时还没有订阅者来订阅这个事件，我们暂时把发布事件的动作包裹在一个函数里，这些包装函数将被存入堆栈中，等到终于有对象来订阅此事件的时候，我们将遍历堆栈并且依次执行这些包装函数，也就是重新发布里面的事件。
+7.	典型实现： `Promise`、浏览器的事件系统
+
+事件系统的一个实现：[event.js](https://gitee.com/pikoyo/front-learn/tree/master/src/js/event.js)
 
 ## 六.命令模式
 
