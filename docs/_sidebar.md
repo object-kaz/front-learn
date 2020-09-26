@@ -49,6 +49,11 @@
 	* [杂记](node/misc.md)
 
 ----
+<h2>网络篇</h2>
+
+* [用户认证](net/auth.md)
+
+----
 <h2>框架篇</h2>
 
 <h3>MVVM框架</h3>
@@ -68,3 +73,10 @@
 <h3>服务端框架</h3>
 
 * [Express](node/express.md)
+
+----
+<h2>业务篇</h2>
+
+*非必须*
+
+* [JIRA](project/jira.md)
